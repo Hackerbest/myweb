@@ -3,52 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Studio</title>
+    <title>RAPEEPHAT REMIX - Studio</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+    
+    <!-- Firebase SDK (Version Compat เพื่อให้เขียนง่าย) -->
+    <script src="https://www.gstatic.com"></script>
+    <script src="https://www.gstatic.com"></script>
+    <script src="https://www.gstatic.com"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com');
-        body { font-family: 'Kanit', sans-serif; transition: all 0.3s ease; }  
-        /* สไตล์โหมด */
+        body { font-family: 'Kanit', sans-serif; transition: all 0.3s ease; overflow-x: hidden; }  
         .mode-dark { background: #0f172a; color: white; }
         .mode-light { background: #f8fafc; color: #1e293b; }
         .glass { backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
         .mode-dark .glass { background: rgba(255, 255, 255, 0.05); }
         .mode-light .glass { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0,0,0,0.05); }
 
-        /* การสลับหน้าแบบลื่นไหล (Smooth Transition) */
-        .page-content {
-            transition: opacity 0.3s ease, transform 1s ease;
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .page-hidden {
-            opacity: 0;
-            transform: translateY(20px);
-            pointer-events: none;
-            position: absolute;
-            width: 100%;
-        }
+        .page-content { transition: opacity 0.4s ease, transform 0.4s ease; }
+        .page-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; position: absolute; width: 100%; top: 80px; }
 
-        /* เมนูหัวเว็บ */
-        .nav-btn { padding: 8px 24px; border-radius: 99px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 500; font-size: 14px; position: relative; }
+        .nav-btn { padding: 8px 24px; border-radius: 99px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 500; font-size: 14px; color: #94a3b8; }
         .active-nav { background: #22d3ee; color: #000 !important; box-shadow: 0 0 20px rgba(34,211,238,0.5); transform: scale(1.05); }
+        
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { background: rgba(34,211,238,0.2); height: 4px; border-radius: 2px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #22d3ee; margin-top: -6px; cursor: pointer; }
     </style>
 </head>
 <body class="pb-40 mode-dark" id="mainBody">
 
-    <!-- Header กึ่งกลาง -->
+    <!-- Header -->
     <header class="p-4 glass sticky top-0 z-50 flex justify-between items-center px-6 md:px-10">
         <h1 class="text-cyan-400 text-xl font-bold flex items-center">
             <i class="fas fa-compact-disc fa-spin mr-2 text-2xl"></i>RAPEEPHAT REMIX
         </h1>
 
-        <!-- เมนูตรงกลางที่ทำให้ลื่นไหล -->
         <div class="hidden sm:flex bg-black/20 p-1 rounded-full border border-white/5 items-center backdrop-blur-md">
             <button onclick="showPage('home')" id="nav-home" class="nav-btn active-nav">หน้าหลัก</button>
             <button onclick="showPage('list')" id="nav-list" class="nav-btn">รายการเพลง</button>
-            <button onclick="showPage('list2')" id="nav-list" class="nav-btn">ติดต่อ</button>
         </div>
 
         <div class="flex gap-3 items-center">
@@ -56,7 +53,7 @@
                 <button onclick="changeStyle('dark')" class="text-[9px] px-2 py-1 rounded hover:text-cyan-400 transition">DARK</button>
                 <button onclick="changeStyle('light')" class="text-[9px] px-2 py-1 rounded hover:text-cyan-400 transition">LIGHT</button>
             </div>
-            <label class="bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2 rounded-full cursor-pointer transition-all shadow-lg active:scale-95 text-sm font-semibold">
+            <label id="uploadBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2 rounded-full cursor-pointer transition-all shadow-lg active:scale-95 text-sm font-semibold">
                 <i class="fas fa-plus mr-1"></i> เพิ่มเพลง
                 <input type="file" id="uploadInput" accept="audio/*" class="hidden">
             </label>
@@ -71,8 +68,8 @@
                     <i class="fas fa-music"></i>
                 </div>
                 <div class="flex-1 w-full">
-                    <h2 id="currentTitle" class="text-4xl font-bold my-2 truncate tracking-tight uppercase italic">--</h2>
-                    <p id="currentDate" class="text-slate-500 text-sm mb-6 tracking-widest"></p>
+                    <h2 id="currentTitle" class="text-4xl font-bold my-2 truncate tracking-tight uppercase italic text-cyan-400">--</h2>
+                    <p id="currentDate" class="text-slate-500 text-sm mb-6 tracking-widest uppercase"></p>
                     <div id="waveform" class="bg-black/20 rounded-2xl p-3 mb-4"></div>
                     <div class="flex items-center gap-4 text-xs font-mono text-slate-500">
                         <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
@@ -80,45 +77,57 @@
                 </div>
             </div>
 
-            <div id="welcome-msg" class="py-10 text-center text-slate-500 italic border-2 border-dashed border-slate-700/30 rounded-3xl">
+            <div id="welcomeMsg" class="py-10 text-center text-slate-500 italic border-2 border-dashed border-slate-700/30 rounded-3xl">
                  <i class="fas fa-play-circle text-6xl mb-4 opacity-10"></i>
                  <p>เลือกเพลงเพื่อเริ่มต้นประสบการณ์ทางดนตรี</p>
             </div>
 
             <div>
                 <h3 class="text-xl font-bold mb-6 flex items-center gap-2 uppercase tracking-wider">
-                    <span class="w-8 h-[2px] bg-cyan-500"></span> รายการในหน้าหลัก
+                    <span class="w-8 h-[2px] bg-cyan-500"></span> ผลงานล่าสุด
                 </h3>
-                <div id="playlist-home" class="grid gap-4"></div>
+                <div id="playlistHome" class="grid gap-4"></div>
             </div>
         </section>
 
         <!-- หน้าที่ 2: รายการเพลง -->
         <main id="page-list" class="page-content page-hidden p-6 mt-4">
             <div class="flex justify-between items-center mb-8">
-                <h3 class="text-2xl font-bold italic">จัดการคลังเพลง (<span id="songCount" class="text-cyan-500">0</span>)</h3>
-                <button onclick="clearAllData()" class="text-xs text-red-500 hover:bg-red-500/10 px-4 py-2 rounded-full transition">ล้างฐานข้อมูล</button>
+                <h3 class="text-2xl font-bold italic">คลังเพลงทั้งหมด (<span id="songCount" class="text-cyan-500">0</span>)</h3>
             </div>
-            <div id="playlist-main" class="grid gap-3"></div>
+            <div id="playlistMain" class="grid gap-3"></div>
         </main>
     </div>
 
     <!-- Bottom Controls -->
     <div class="fixed bottom-0 w-full glass p-5 px-10 flex items-center justify-between z-50 border-t border-white/5 shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
-        <div class="w-1/3 truncate font-bold text-sm tracking-tight" id="barTitle">READY TO PLAY</div>
+        <div class="w-1/3 truncate font-bold text-sm tracking-tight text-cyan-400" id="barTitle">READY</div>
         <div class="flex flex-col items-center w-1/3">
-            <button id="playBtn" class="bg-white text-black w-14 h-14 rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+            <button id="playBtn" class="bg-white text-black w-14 h-14 rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-lg">
                 <i id="playIcon" class="fas fa-play ml-1 text-xl"></i>
             </button>
         </div>
         <div class="w-1/3 flex justify-end items-center gap-4">
-            <i id="volumeIcon" class="fas fa-volume-up text-cyan-400"></i>
-            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.7" class="w-32 h-1 bg-slate-700 accent-cyan-400 cursor-pointer rounded-lg">
+            <i class="fas fa-volume-up text-cyan-400"></i>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.7" class="w-32">
         </div>
     </div>
 
     <script>
-        let db;
+        // 1. Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAA4KDuxv3FoaYi7RAgm0_ypb8RdBVXGak",
+            authDomain: "myrpt-14f92.firebaseapp.com",
+            projectId: "myrpt-14f92",
+            storageBucket: "myrpt-14f92.firebasestorage.app",
+            messagingSenderId: "463177303761",
+            appId: "1:463177303761:web:6fd2559de7f610d6f2a7f0"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // 2. WaveSurfer
         const ws = WaveSurfer.create({
             container: '#waveform',
             waveColor: '#475569',
@@ -130,7 +139,7 @@
             barGap: 3
         });
 
-        // ระบบสลับหน้าแบบลื่นไหล (Smooth Logic)
+        // 3. Page Switching
         function showPage(pageName) {
             const home = document.getElementById('page-home');
             const list = document.getElementById('page-list');
@@ -150,79 +159,96 @@
             }
         }
 
-        const dbRequest = indexedDB.open("MusicDB_Final", 1);
-        dbRequest.onupgradeneeded = e => { e.target.result.createObjectStore("songs", { keyPath: "id" }); };
-        dbRequest.onsuccess = e => { db = e.target.result; loadSongs(); };
-
+        // 4. Style Change
         function changeStyle(theme) {
-            document.getElementById('mainBody').className = (theme === 'dark') ? 'pb-40 mode-dark' : 'pb-40 mode-light';
+            document.getElementById('mainBody').className = `pb-40 mode-${theme}`;
         }
 
-        document.getElementById('uploadInput').onchange = e => {
+        // 5. Upload to Firebase
+        document.getElementById('uploadInput').onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = ev => {
-                const data = { id: Date.now(), title: file.name.replace(/\.[^/.]+$/, ""), date: new Date().toLocaleString('th-TH'), audio: ev.target.result };
-                const tx = db.transaction("songs", "readwrite");
-                tx.objectStore("songs").add(data);
-                tx.oncomplete = () => { loadSongs(); e.target.value = ''; };
-            };
-            reader.readAsArrayBuffer(file);
+
+            const btn = document.getElementById('uploadBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> อัปโหลดอยู่...';
+            btn.style.pointerEvents = 'none';
+
+            try {
+                const fileName = `${Date.now()}_${file.name}`;
+                const storageRef = storage.ref(`songs/${fileName}`);
+                await storageRef.put(file);
+                const url = await storageRef.getDownloadURL();
+
+                await db.collection("songs").add({
+                    title: file.name.replace(/\.[^/.]+$/, ""),
+                    url: url,
+                    date: new Date().toLocaleString('th-TH'),
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert("เพิ่มเพลงสำเร็จ!");
+            } catch (err) {
+                alert("เกิดข้อผิดพลาด: " + err.message);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-plus mr-1"></i> เพิ่มเพลง';
+                btn.style.pointerEvents = 'auto';
+            }
         };
 
-        function loadSongs() {
-            const tx = db.transaction("songs", "readonly");
-            tx.objectStore("songs").getAll().onsuccess = e => {
-                const songs = e.target.result;
-                document.getElementById('songCount').innerText = songs.length;
-                const html = songs.map(s => `
-                    <div class="glass p-5 rounded-2xl flex justify-between items-center hover:bg-cyan-500/10 cursor-pointer transition-all border border-transparent hover:border-cyan-500/30 group" onclick="playSong(${s.id})">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500 group-hover:text-black transition-all">
-                                <i class="fas fa-play text-xs"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-lg leading-tight">${s.title}</p>
-                                <p class="text-[10px] opacity-40 uppercase tracking-widest">${s.date}</p>
-                            </div>
+        // 6. Data Listeners
+        db.collection("songs").orderBy("timestamp", "desc").onSnapshot(snap => {
+            const songs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            document.getElementById('songCount').innerText = songs.length;
+            
+            const html = songs.map(s => `
+                <div onclick="playSong('${s.url}','${s.title}','${s.date}')" 
+                     class="glass p-5 rounded-2xl cursor-pointer hover:border-cyan-500 transition-all flex justify-between items-center group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-cyan-500/10 rounded-full flex items-center justify-center text-cyan-500 group-hover:bg-cyan-500 group-hover:text-black transition">
+                            <i class="fas fa-play text-xs"></i>
                         </div>
-                        <button onclick="event.stopPropagation(); deleteSong(${s.id})" class="text-slate-600 hover:text-red-500 p-2 transition-colors"><i class="fas fa-trash-alt"></i></button>
+                        <div>
+                            <b class="text-lg">${s.title}</b>
+                            <p class="text-[10px] opacity-40 uppercase">${s.date}</p>
+                        </div>
                     </div>
-                `).reverse().join('');
-                document.getElementById('playlist-home').innerHTML = html;
-                document.getElementById('playlist-main').innerHTML = html;
-            };
+                    <i class="fas fa-chevron-right opacity-20"></i>
+                </div>
+            `).join('');
+
+            document.getElementById('playlistHome').innerHTML = html;
+            document.getElementById('playlistMain').innerHTML = html;
+        });
+
+        // 7. Play Logic
+        function playSong(url, title, date) {
+            document.getElementById('playerView').classList.remove('hidden');
+            document.getElementById('welcomeMsg').classList.add('hidden');
+            document.getElementById('currentTitle').innerText = title;
+            document.getElementById('barTitle').innerText = title;
+            document.getElementById('currentDate').innerText = "ADDED ON: " + date;
+            
+            ws.load(url);
+            ws.once('ready', () => {
+                document.getElementById('totalTime').innerText = formatTime(ws.getDuration());
+                ws.play();
+            });
         }
 
-        function playSong(id) {
-            showPage('home');
-            const tx = db.transaction("songs", "readonly");
-            tx.objectStore("songs").get(id).onsuccess = e => {
-                const s = e.target.result;
-                const url = URL.createObjectURL(new Blob([s.audio]));
-                document.getElementById('playerView').classList.remove('hidden');
-                document.getElementById('welcome-msg').classList.add('hidden');
-                document.getElementById('currentTitle').innerText = s.title;
-                document.getElementById('barTitle').innerText = s.title;
-                document.getElementById('currentDate').innerText = "ADDED: " + s.date;
-                ws.load(url);
-                ws.on('ready', () => { 
-                    ws.play(); 
-                    document.getElementById('totalTime').innerText = formatTime(ws.getDuration()); 
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-            };
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
         }
 
+        // Controls
         document.getElementById('playBtn').onclick = () => ws.playPause();
+        document.getElementById('volumeSlider').oninput = (e) => ws.setVolume(e.target.value);
+        
         ws.on('play', () => document.getElementById('playIcon').className = 'fas fa-pause');
         ws.on('pause', () => document.getElementById('playIcon').className = 'fas fa-play ml-1');
-        ws.on('audioprocess', () => { document.getElementById('currentTime').innerText = formatTime(ws.getCurrentTime()); });
-        document.getElementById('volumeSlider').oninput = e => ws.setVolume(e.target.value);
-        function deleteSong(id) { if(confirm('ลบเพลงนี้?')) { db.transaction("songs", "readwrite").objectStore("songs").delete(id).oncomplete = () => loadSongs(); } }
-        function clearAllData() { if(confirm('ล้างข้อมูลทั้งหมด?')) { indexedDB.deleteDatabase("MusicDB_Final"); location.reload(); } }
-        function formatTime(s) { const m = Math.floor(s/60); const sc = Math.floor(s%60); return `${m}:${sc < 10 ? '0' : ''}${sc}`; }
+        ws.on('audioprocess', () => {
+            document.getElementById('currentTime').innerText = formatTime(ws.getCurrentTime());
+        });
     </script>
 </body>
 </html>
