@@ -59,10 +59,16 @@ appId: "1:463177303761:web:6fd2559de7f610d6f2a7f0"
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// ================= WaveSurfer (FIX) =================
+// ================= Audio Element (FIX) =================
+const audioEl = document.createElement('audio');
+audioEl.crossOrigin = "anonymous";
+audioEl.preload = "auto";
+
+// ================= WaveSurfer (FIX ชัวร์) =================
 const ws = WaveSurfer.create({
 container: '#waveform',
-backend: 'MediaElement', // 🔥 สำคัญที่สุด
+backend: 'MediaElement',
+media: audioEl,              // 🔥 ผูก audio ตรง ๆ
 waveColor: '#475569',
 progressColor: '#22d3ee',
 cursorColor: '#22d3ee',
@@ -108,19 +114,26 @@ return `
 }).join('');
 });
 
-// ================= Play + View =================
+// ================= Play + View (FIX) =================
 function playSong(id, url, title, views){
 playerView.classList.remove('hidden');
 currentTitle.innerText = title;
 currentViews.innerText = `👁 ${views + 1} views`;
 
-ws.stop();        // กัน state ค้าง
+// reset state กันค้าง
+ws.pause();
+ws.empty();
+
+// โหลดใหม่
 ws.load(url);
 
-ws.once('ready', ()=>{
-ws.play();
+// unlock + play
+ws.once('ready', () => {
+audioEl.currentTime = 0;
+audioEl.play().catch(()=>{}); // กัน browser block
 });
 
+// update view
 db.collection("songs").doc(id).update({
 views: firebase.firestore.FieldValue.increment(1)
 });
