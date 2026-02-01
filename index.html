@@ -17,14 +17,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-body { font-family:'Kanit',sans-serif; }
-.mode-dark { background:#0f172a; color:#fff; }
-.glass { backdrop-filter: blur(10px); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); }
-.page-hidden{display:none;}
+body{font-family:'Kanit',sans-serif;background:#0f172a;color:#fff}
+.glass{backdrop-filter:blur(10px);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
 </style>
 </head>
 
-<body class="mode-dark pb-40">
+<body class="pb-40">
 
 <header class="glass p-4 flex justify-between items-center sticky top-0 z-50">
 <h1 class="text-cyan-400 font-bold">
@@ -37,9 +35,10 @@ body { font-family:'Kanit',sans-serif; }
 </header>
 
 <section class="p-6 space-y-6">
+
 <div id="playerView" class="glass p-6 rounded-3xl hidden">
 <h2 id="currentTitle" class="text-xl font-bold text-cyan-400"></h2>
-<p class="text-xs opacity-50" id="currentViews"></p>
+<p id="currentViews" class="text-xs opacity-50 mb-2"></p>
 <div id="waveform"></div>
 </div>
 
@@ -47,7 +46,7 @@ body { font-family:'Kanit',sans-serif; }
 </section>
 
 <script>
-// Firebase
+// ================= Firebase =================
 firebase.initializeApp({
 apiKey: "AIzaSyAA4KDuxv3FoaYi7RAgm0_ypb8RdBVXGak",
 authDomain: "myrpt-14f92.firebaseapp.com",
@@ -60,25 +59,28 @@ appId: "1:463177303761:web:6fd2559de7f610d6f2a7f0"
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// WaveSurfer
+// ================= WaveSurfer (FIX) =================
 const ws = WaveSurfer.create({
-container:'#waveform',
-waveColor:'#475569',
-progressColor:'#22d3ee',
-height:80
+container: '#waveform',
+backend: 'MediaElement', // 🔥 สำคัญที่สุด
+waveColor: '#475569',
+progressColor: '#22d3ee',
+cursorColor: '#22d3ee',
+height: 80,
+responsive: true
 });
 
-// Upload
+// ================= Upload =================
 uploadInput.onchange = async e => {
 const file = e.target.files[0];
 if(!file) return;
 
-const ref = storage.ref('songs/'+Date.now()+"_"+file.name);
+const ref = storage.ref('songs/' + Date.now() + '_' + file.name);
 await ref.put(file);
 const url = await ref.getDownloadURL();
 
 await db.collection("songs").add({
-title: file.name.replace(/\..+/,''),
+title: file.name.replace(/\..+/, ''),
 url,
 path: ref.fullPath,
 views: 0,
@@ -88,14 +90,14 @@ created: firebase.firestore.FieldValue.serverTimestamp()
 alert("เพิ่มเพลงแล้ว");
 };
 
-// Load songs
+// ================= Load Songs =================
 db.collection("songs").orderBy("created","desc")
 .onSnapshot(snap=>{
 playlist.innerHTML = snap.docs.map(d=>{
 const s = d.data();
 return `
 <div class="glass p-4 rounded-xl flex justify-between items-center">
-<div onclick="playSong('${d.id}','${s.url}','${s.title}',${s.views})" class="cursor-pointer">
+<div class="cursor-pointer" onclick="playSong('${d.id}','${s.url}','${s.title}',${s.views})">
 <b>${s.title}</b>
 <div class="text-xs opacity-50">👁 ${s.views} views</div>
 </div>
@@ -106,22 +108,26 @@ return `
 }).join('');
 });
 
-// Play + view count
-function playSong(id,url,title,views){
+// ================= Play + View =================
+function playSong(id, url, title, views){
 playerView.classList.remove('hidden');
 currentTitle.innerText = title;
-currentViews.innerText = `👁 ${views+1} views`;
+currentViews.innerText = `👁 ${views + 1} views`;
 
+ws.stop();        // กัน state ค้าง
 ws.load(url);
-ws.once('ready',()=>ws.play());
+
+ws.once('ready', ()=>{
+ws.play();
+});
 
 db.collection("songs").doc(id).update({
 views: firebase.firestore.FieldValue.increment(1)
 });
 }
 
-// Delete
-async function deleteSong(id,path){
+// ================= Delete =================
+async function deleteSong(id, path){
 if(!confirm("ลบเพลงนี้ถาวร?")) return;
 
 await storage.ref(path).delete();
