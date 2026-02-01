@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Studio - Center Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com');
+        body { font-family: 'Kanit', sans-serif; transition: all 0.3s ease; }
+        .mode-dark { background: #0f172a; color: white; }
+        .mode-dark .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .mode-light { background: #f8fafc; color: #1e293b; }
+        .mode-light .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        
+        /* สไตล์ปุ่มเมนูบนหัวเว็บ */
+        .nav-btn { padding: 8px 20px; border-radius: 99px; transition: 0.3s; font-weight: 500; font-size: 14px; }
+        .active-nav { background: #22d3ee; color: #000 !important; box-shadow: 0 0 15px rgba(34,211,238,0.4); }
+    </style>
+</head>
+<body class="pb-40 mode-dark" id="mainBody">
+
+    <!-- Header ที่มีเมนูอยู่ตรงกลาง -->
+    <header class="p-4 glass sticky top-0 z-50 flex justify-between items-center px-6 md:px-10">
+        <!-- ฝั่งซ้าย: Logo -->
+        <h1 class="text-cyan-400 text-xl font-bold flex items-center">
+            <i class="fas fa-compact-disc fa-spin mr-2"></i> My Studio
+        </h1>
+
+        <!-- ตรงกลาง: เมนูหน้าหลัก/รายการ (ที่คุณต้องการ) -->
+        <div class="hidden sm:flex bg-black/20 p-1 rounded-full border border-white/5 items-center">
+            <button onclick="showPage('home')" id="nav-home" class="nav-btn active-nav">หน้าหลัก</button>
+            <button onclick="showPage('list')" id="nav-list" class="nav-btn">รายการเพลง</button>
+        </div>
+
+        <!-- ฝั่งขวา: เครื่องมือ -->
+        <div class="flex gap-2 md:gap-4 items-center">
+            <button onclick="changeStyle('dark')" class="text-[10px] px-2 py-1 rounded hover:bg-cyan-500/20">DARK</button>
+            <button onclick="changeStyle('light')" class="text-[10px] px-2 py-1 rounded hover:bg-cyan-500/20">LIGHT</button>
+            
+            <label class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 md:px-6 py-2 rounded-full cursor-pointer transition shadow-lg text-xs md:text-sm">
+                <i class="fas fa-plus mr-1"></i> เพิ่มเพลง
+                <input type="file" id="uploadInput" accept="audio/*" class="hidden">
+            </label>
+        </div>
+    </header>
+
+    <!-- หน้าที่ 1: หน้าหลัก (แสดงเครื่องเล่นเพลง) -->
+    <section id="page-home" class="container mx-auto p-6 mt-4 transition-all duration-500">
+        <div id="playerView" class="glass p-8 rounded-3xl flex flex-col md:flex-row items-center gap-8 shadow-2xl hidden border-t-4 border-cyan-500">
+            <div class="w-64 h-64 bg-slate-800 rounded-2xl flex items-center justify-center text-7xl text-cyan-500 shadow-inner overflow-hidden">
+                <i class="fas fa-music"></i>
+            </div>
+            <div class="flex-1 w-full">
+                <h2 id="currentTitle" class="text-4xl font-bold my-2 truncate tracking-tight">--</h2>
+                <p id="currentDate" class="text-slate-500 text-sm mb-6 uppercase"></p>
+                <div id="waveform" class="bg-black/30 rounded-xl p-2 mb-4"></div>
+                <div class="flex items-center gap-4 text-xs font-mono text-slate-500">
+                    <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
+                </div>
+            </div>
+        </div>
+        <div id="welcome-msg" class="py-20 text-center text-slate-500 italic">
+             <i class="fas fa-play-circle text-6xl mb-4 opacity-20"></i>
+             <p>ยินดีต้อนรับ! เลือกเพลงจาก "รายการเพลง" เพื่อเริ่มต้น</p>
+        </div>
+    </section>
+
+    <!-- หน้าที่ 2: รายการเพลง (แสดงฐานข้อมูล) -->
+    <main id="page-list" class="container mx-auto p-6 hidden transition-all duration-500">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold">คลังเพลงในฐานข้อมูล (<span id="songCount" class="text-cyan-500">0</span>)</h3>
+            <button onclick="clearAllData()" class="text-xs text-red-400 hover:text-red-300">ล้างคลังเพลง</button>
+        </div>
+        <div id="playlist" class="grid gap-3"></div>
+    </main>
+
+    <!-- แถบควบคุมเสียง (Bottom Bar) -->
+    <div class="fixed bottom-0 w-full glass p-5 px-6 md:px-10 flex items-center justify-between z-50 border-t border-white/5">
+        <div class="w-1/3 truncate font-bold text-sm" id="barTitle">--</div>
+        <div class="flex flex-col items-center w-1/3">
+            <button id="playBtn" class="bg-white text-black w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition shadow-xl">
+                <i id="playIcon" class="fas fa-play ml-1 text-xl"></i>
+            </button>
+        </div>
+        <div class="w-1/3 flex justify-end items-center gap-4">
+            <i id="volumeIcon" class="fas fa-volume-up text-cyan-400"></i>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.7" class="w-20 md:w-32 h-1 bg-slate-700 accent-cyan-400 cursor-pointer">
+        </div>
+    </div>
+
+    <script>
+        let db;
+        const ws = WaveSurfer.create({
+            container: '#waveform',
+            waveColor: '#475569',
+            progressColor: '#22d3ee',
+            cursorColor: '#22d3ee',
+            barWidth: 3,
+            height: 80,
+            responsive: true
+        });
+
+        // ระบบสลับหน้า
+        function showPage(pageName) {
+            const home = document.getElementById('page-home');
+            const list = document.getElementById('page-list');
+            const btnHome = document.getElementById('nav-home');
+            const btnList = document.getElementById('nav-list');
+
+            if(pageName === 'home') {
+                home.classList.remove('hidden');
+                list.classList.add('hidden');
+                btnHome.classList.add('active-nav');
+                btnList.classList.remove('active-nav');
+            } else {
+                home.classList.add('hidden');
+                list.classList.remove('hidden');
+                btnHome.classList.remove('active-nav');
+                btnList.classList.add('active-nav');
+            }
+        }
+
+        // ระบบ Database (เหมือนเดิมที่คุณส่งมา)
+        const dbRequest = indexedDB.open("MusicDB", 1);
+        dbRequest.onupgradeneeded = (e) => {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("songs")) {
+                db.createObjectStore("songs", { keyPath: "id" });
+            }
+        };
+        dbRequest.onsuccess = (e) => {
+            db = e.target.result;
+            loadSongsFromDB();
+        };
+
+        function changeStyle(theme) {
+            const body = document.getElementById('mainBody');
+            body.className = (theme === 'dark') ? 'pb-40 mode-dark' : 'pb-40 mode-light';
+        }
+
+        document.getElementById('uploadInput').onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const songData = {
+                    id: Date.now(),
+                    title: file.name.replace(/\.[^/.]+$/, ""),
+                    date: new Date().toLocaleString('th-TH'),
+                    audioData: event.target.result
+                };
+                const tx = db.transaction("songs", "readwrite");
+                tx.objectStore("songs").add(songData);
+                tx.oncomplete = () => { loadSongsFromDB(); e.target.value = ''; alert('เพิ่มเพลงลงรายการแล้ว!'); };
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        function loadSongsFromDB() {
+            const tx = db.transaction("songs", "readonly");
+            const store = tx.objectStore("songs");
+            store.getAll().onsuccess = (e) => {
+                const songs = e.target.result;
+                document.getElementById('songCount').innerText = songs.length;
+                const container = document.getElementById('playlist');
+                container.innerHTML = songs.map(s => `
+                    <div class="glass p-5 rounded-2xl flex justify-between items-center hover:bg-cyan-500/10 cursor-pointer transition border border-transparent hover:border-cyan-500/50" onclick="playSong(${s.id})">
+                        <div class="flex items-center gap-4">
+                            <i class="fas fa-play-circle text-2xl text-cyan-500"></i>
+                            <div>
+                                <p class="font-bold text-lg">${s.title}</p>
+                                <p class="text-xs opacity-50 uppercase tracking-widest">${s.date}</p>
+                            </div>
+                        </div>
+                        <button onclick="event.stopPropagation(); deleteSong(${s.id})" class="text-slate-600 hover:text-red-500 p-2"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `).reverse().join('');
+            };
+        }
+
+        function playSong(id) {
+            showPage('home'); // สลับไปหน้าหลักเพื่อดูเครื่องเล่น
+            const tx = db.transaction("songs", "readonly");
+            tx.objectStore("songs").get(id).onsuccess = (e) => {
+                const song = e.target.result;
+                const blob = new Blob([song.audioData], { type: 'audio/mp3' });
+                const url = URL.createObjectURL(blob);
+                
+                document.getElementById('playerView').classList.remove('hidden');
+                document.getElementById('welcome-msg').classList.add('hidden');
+                document.getElementById('currentTitle').innerText = song.title;
+                document.getElementById('barTitle').innerText = song.title;
+                document.getElementById('currentDate').innerText = "ADDED ON: " + song.date;
+                
+                ws.load(url);
+                ws.on('ready', () => {
+                    ws.play();
+                    document.getElementById('totalTime').innerText = formatTime(ws.getDuration());
+                });
+            };
+        }
+
+        // ระบบควบคุม
+        document.getElementById('playBtn').onclick = () => ws.playPause();
+        ws.on('play', () => document.getElementById('playIcon').className = 'fas fa-pause');
+        ws.on('pause', () => document.getElementById('playIcon').className = 'fas fa-play ml-1');
+        ws.on('audioprocess', () => { document.getElementById('currentTime').innerText = formatTime(ws.getCurrentTime()); });
+        document.getElementById('volumeSlider').oninput = (e) => { ws.setVolume(e.target.value); };
+        function deleteSong(id) { if(confirm('ลบเพลงนี้?')) { const tx = db.transaction("songs", "readwrite"); tx.objectStore("songs").delete(id); tx.oncomplete = () => loadSongsFromDB(); } }
+        function clearAllData() { if(confirm('ลบทุกเพลง?')) { const tx = db.transaction("songs", "readwrite"); tx.objectStore("songs").clear(); tx.oncomplete = () => location.reload(); } }
+        function formatTime(s) { const min = Math.floor(s / 60); const sec = Math.floor(s % 60); return `${min}:${sec < 10 ? '0' : ''}${sec}`; }
+    </script>
+</body>
+</html>
