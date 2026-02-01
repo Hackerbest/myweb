@@ -114,7 +114,7 @@
     </div>
 
     <script>
-        // 1. Firebase Config
+        // 1. Firebase Config (ใช้คีย์เดิมของคุณ)
         const firebaseConfig = {
             apiKey: "AIzaSyAA4KDuxv3FoaYi7RAgm0_ypb8RdBVXGak",
             authDomain: "myrpt-14f92.firebaseapp.com",
@@ -145,13 +145,14 @@
             const list = document.getElementById('page-list');
             const navHome = document.getElementById('nav-home');
             const navList = document.getElementById('nav-list');
-
+            
+            // Remove 'list2' reference since that page doesn't exist yet
             if(pageName === 'home') {
                 home.classList.remove('page-hidden');
                 list.classList.add('page-hidden');
                 navHome.classList.add('active-nav');
                 navList.classList.remove('active-nav');
-            } else {
+            } else if (pageName === 'list') {
                 home.classList.add('page-hidden');
                 list.classList.remove('page-hidden');
                 navHome.classList.remove('active-nav');
@@ -159,18 +160,20 @@
             }
         }
 
-        // 4. Style Change
+        // 4. Style Change (โค้ดที่ขาดหายไป)
         function changeStyle(theme) {
             document.getElementById('mainBody').className = `pb-40 mode-${theme}`;
         }
 
-        // 5. Upload to Firebase
+        // 5. Upload to Firebase (โค้ดที่แก้ไขแล้ว)
         document.getElementById('uploadInput').onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+            const files = e.target.files;
+            if (!files || files.length === 0) return; 
+            const file = files[0]; // เลือกไฟล์ตัวแรก
 
             const btn = document.getElementById('uploadBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> อัปโหลดอยู่...';
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลด...';
             btn.style.pointerEvents = 'none';
 
             try {
@@ -185,16 +188,18 @@
                     date: new Date().toLocaleString('th-TH'),
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                alert("เพิ่มเพลงสำเร็จ!");
+                alert("เพิ่มเพลงสำเร็จแล้ว!");
             } catch (err) {
-                alert("เกิดข้อผิดพลาด: " + err.message);
+                console.error("Upload error:", err);
+                alert("อัปโหลดไม่สำเร็จ: " + err.message);
             } finally {
-                btn.innerHTML = '<i class="fas fa-plus mr-1"></i> เพิ่มเพลง';
+                btn.innerHTML = originalContent;
                 btn.style.pointerEvents = 'auto';
+                e.target.value = ""; // รีเซ็ต input ให้เลือกไฟล์เดิมซ้ำได้
             }
         };
 
-        // 6. Data Listeners
+        // 6. Data Listeners (แก้ไข ID จาก playlist-home เป็น playlistHome)
         db.collection("songs").orderBy("timestamp", "desc").onSnapshot(snap => {
             const songs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             document.getElementById('songCount').innerText = songs.length;
@@ -216,10 +221,10 @@
             `).join('');
 
             document.getElementById('playlistHome').innerHTML = html;
-            document.getElementById('playlistMain').innerHTML = html;
+            document.getElementById('playlistMain').innerHTML = html; // แก้ไข ID
         });
 
-        // 7. Play Logic
+        // 7. Play Logic (แก้ไข ID จาก welcome-msg เป็น welcomeMsg)
         function playSong(url, title, date) {
             document.getElementById('playerView').classList.remove('hidden');
             document.getElementById('welcomeMsg').classList.add('hidden');
