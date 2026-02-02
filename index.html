@@ -3,179 +3,154 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RAPEEPHAT REMIX - Studio</title>
+<title>RAPEEPHAT SHOP</title>
 
-<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
-
-<!-- WaveSurfer -->
-<script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
-
-<!-- Firebase v8 -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-
-<!-- Font Awesome -->
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
-
 <style>
-body { font-family: 'Kanit', sans-serif; overflow-x: hidden; }
-.mode-dark { background:#0f172a; color:#fff; }
-.mode-light { background:#f8fafc; color:#1e293b; }
-.glass { backdrop-filter: blur(10px); background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); }
-.page-hidden { display:none; }
-.nav-btn { padding:8px 24px; border-radius:999px; color:#94a3b8; }
-.active-nav { background:#22d3ee; color:#000; }
+body{font-family:'Kanit',sans-serif}
+.mode-dark{background:#0f172a;color:#e5e7eb}
+.mode-light{background:#f8fafc;color:#0f172a}
+.glass{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.mode-light .glass{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.1)}
+
+.nav-wrap{
+position:relative;
+display:flex;
+background:rgba(0,0,0,.25);
+padding:6px;
+border-radius:999px;
+}
+
+.nav-btn{
+padding:8px 26px;
+border-radius:999px;
+font-weight:500;
+font-size:14px;
+color:#94a3b8;
+position:relative;
+z-index:2;
+transition:color .3s ease;
+}
+
+.nav-btn:hover{color:#e5faff}
+
+.nav-indicator{
+position:absolute;
+top:6px;
+bottom:6px;
+width:0;
+border-radius:999px;
+background:#22d3ee;
+transition:all .45s cubic-bezier(.4,0,.2,1);
+z-index:1;
+}
+
+.page{
+transition:opacity .45s ease, transform .45s ease;
+}
+.page-hidden{
+opacity:0;
+transform:translateY(20px);
+pointer-events:none;
+position:absolute;
+width:100%;
+}
 </style>
 </head>
 
-<body class="mode-dark pb-40" id="mainBody">
+<body class="mode-dark pb-40">
 
-<header class="p-4 glass flex justify-between items-center sticky top-0 z-50">
-<h1 class="text-cyan-400 font-bold">
+<header class="p-4 glass sticky top-0 z-50 flex justify-between items-center px-6">
+<h1 class="text-cyan-400 text-xl font-bold flex items-center">
 <i class="fas fa-compact-disc fa-spin mr-2"></i>RAPEEPHAT REMIX
 </h1>
 
-<div class="flex gap-2">
-<button onclick="showPage('home')" id="nav-home" class="nav-btn active-nav">หน้าหลัก</button>
-<button onclick="showPage('list')" id="nav-list" class="nav-btn">รายการเพลง</button>
+<div class="hidden sm:flex nav-wrap" id="navWrap">
+<div class="nav-indicator" id="navIndicator"></div>
+<button onclick="showPage('home')" id="nav-home" class="nav-btn">หน้าหลัก</button>
+<button onclick="showPage('list')" id="nav-list" class="nav-btn">รายการ</button>
 </div>
 
-<label id="uploadBtn" class="bg-cyan-600 px-4 py-2 rounded-full cursor-pointer">
-<i class="fas fa-plus"></i> เพิ่มเพลง
-<input type="file" id="uploadInput" accept="audio/*" hidden>
-</label>
+<button onclick="toggleMode()" class="w-10 h-10 glass rounded-full flex items-center justify-center">
+<i id="modeIcon" class="fas fa-moon"></i>
+</button>
 </header>
 
-<section id="page-home" class="p-6 space-y-6">
-<div id="playerView" class="glass p-6 rounded-3xl hidden">
-<h2 id="currentTitle" class="text-2xl font-bold text-cyan-400">--</h2>
-<p id="currentDate" class="text-xs opacity-60 mb-4"></p>
-<div id="waveform"></div>
-<div class="mt-2 text-xs">
-<span id="currentTime">0:00</span> /
-<span id="totalTime">0:00</span>
-</div>
-</div>
+<div class="container mx-auto relative">
 
-<div id="welcomeMsg" class="text-center opacity-50 py-10">
-เลือกเพลงเพื่อเริ่มเล่น
-</div>
-
-<div id="playlistHome" class="grid gap-3"></div>
+<section id="page-home" class="page p-6 space-y-8">
+<h2 class="text-2xl font-bold text-cyan-400">สินค้าใหม่ล่าสุด</h2>
+<div id="productHome" class="grid md:grid-cols-3 gap-6"></div>
 </section>
 
-<section id="page-list" class="p-6 page-hidden">
-<h3 class="mb-4 font-bold">
-คลังเพลงทั้งหมด (<span id="songCount">0</span>)
+<section id="page-list" class="page page-hidden p-6">
+<h3 class="text-2xl font-bold mb-4">
+สินค้าทั้งหมด (<span>5</span>)
 </h3>
-<div id="playlistMain" class="grid gap-3"></div>
+<div id="productMain" class="grid md:grid-cols-4 gap-6"></div>
 </section>
 
-<div class="fixed bottom-0 w-full glass p-4 flex justify-between items-center">
-<div id="barTitle" class="text-cyan-400 font-bold truncate">READY</div>
-<button id="playBtn" class="bg-white text-black w-12 h-12 rounded-full">
-<i id="playIcon" class="fas fa-play ml-1"></i>
-</button>
-<input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.7">
 </div>
 
 <script>
-/* Firebase Config */
-firebase.initializeApp({
-apiKey: "AIzaSyAA4KDuxv3FoaYi7RAgm0_ypb8RdBVXGak",
-authDomain: "myrpt-14f92.firebaseapp.com",
-projectId: "myrpt-14f92",
-storageBucket: "myrpt-14f92.firebasestorage.app",
-messagingSenderId: "463177303761",
-appId: "1:463177303761:web:6fd2559de7f610d6f2a7f0"
-});
+const products=[
+{name:"VOL.1",price:"150",image:"https://picsum.photos/500/300?1"},
+{name:"VOL.2",price:"180",image:"https://picsum.photos/500/300?2"},
+{name:"PACK",price:"250",image:"https://picsum.photos/500/300?3"},
+{name:"FX",price:"120",image:"https://picsum.photos/500/300?4"},
+{name:"CLUB ",price:"300",image:"https://picsum.photos/500/300?5"}
+];
 
-const db = firebase.firestore();
-const storage = firebase.storage();
+const body=document.body;
+const icon=document.getElementById("modeIcon");
+const indicator=document.getElementById("navIndicator");
 
-/* WaveSurfer */
-const ws = WaveSurfer.create({
-container: '#waveform',
-waveColor: '#475569',
-progressColor: '#22d3ee',
-height: 80
-});
+function toggleMode(){
+const dark=body.classList.contains("mode-dark");
+body.classList.toggle("mode-dark",!dark);
+body.classList.toggle("mode-light",dark);
+icon.className=dark?"fas fa-sun":"fas fa-moon";
+localStorage.theme=dark?"light":"dark";
+}
 
-/* Page Switch */
+function moveIndicator(btn){
+const r=btn.getBoundingClientRect();
+const p=btn.parentElement.getBoundingClientRect();
+indicator.style.width=r.width+"px";
+indicator.style.left=(r.left-p.left)+"px";
+}
+
 function showPage(p){
-document.getElementById('page-home').classList.toggle('page-hidden', p!=='home');
-document.getElementById('page-list').classList.toggle('page-hidden', p!=='list');
-document.getElementById('nav-home').classList.toggle('active-nav', p==='home');
-document.getElementById('nav-list').classList.toggle('active-nav', p==='list');
+["home","list"].forEach(x=>{
+document.getElementById("page-"+x).classList.toggle("page-hidden",x!==p);
+});
+
+const btn=document.getElementById("nav-"+p);
+moveIndicator(btn);
 }
 
-/* Upload */
-uploadInput.onchange = async e => {
-const file = e.target.files[0];
-if(!file) return;
-
-const ref = storage.ref('songs/'+Date.now()+"_"+file.name);
-await ref.put(file);
-const url = await ref.getDownloadURL();
-
-await db.collection("songs").add({
-title: file.name.replace(/\..+/,''),
-url,
-date: new Date().toLocaleString('th-TH'),
-timestamp: firebase.firestore.FieldValue.serverTimestamp()
-});
-
-alert("เพิ่มเพลงสำเร็จ");
-};
-
-/* Load Songs */
-db.collection("songs").orderBy("timestamp","desc")
-.onSnapshot(snap=>{
-const songs = snap.docs.map(d=>({id:d.id,...d.data()}));
-songCount.innerText = songs.length;
-
-const html = songs.map(s=>`
-<div onclick="playSong('${s.url}','${s.title}','${s.date}')"
-class="glass p-4 rounded-xl cursor-pointer">
-<b>${s.title}</b>
-<div class="text-xs opacity-50">${s.date}</div>
-</div>`).join('');
-
-playlistHome.innerHTML = html;
-playlistMain.innerHTML = html;
-});
-
-/* Play */
-function playSong(url,title,date){
-playerView.classList.remove('hidden');
-welcomeMsg.classList.add('hidden');
-currentTitle.innerText = title;
-barTitle.innerText = title;
-currentDate.innerText = date;
-
-ws.load(url);
-ws.once('ready',()=>{
-totalTime.innerText = format(ws.getDuration());
-ws.play();
+function render(){
+productHome.innerHTML="";
+productMain.innerHTML="";
+products.forEach(p=>{
+const card=`
+<div class="glass rounded-2xl overflow-hidden">
+<img src="${p.image}" class="h-48 w-full object-cover">
+<div class="p-4">
+<h4 class="font-bold text-lg">${p.name}</h4>
+<p class="text-cyan-400 font-semibold mt-1">${p.price} บาท</p>
+</div>
+</div>`;
+productHome.innerHTML+=card;
+productMain.innerHTML+=card;
 });
 }
 
-function format(s){
-const m = Math.floor(s/60);
-const ss = Math.floor(s%60).toString().padStart(2,'0');
-return `${m}:${ss}`;
-}
-
-playBtn.onclick = ()=>ws.playPause();
-volumeSlider.oninput = e=>ws.setVolume(e.target.value);
-ws.on('play',()=>playIcon.className='fas fa-pause');
-ws.on('pause',()=>playIcon.className='fas fa-play ml-1');
-ws.on('audioprocess',()=>currentTime.innerText=format(ws.getCurrentTime()));
+render();
+moveIndicator(document.getElementById("nav-home"));
 </script>
 
 </body>
