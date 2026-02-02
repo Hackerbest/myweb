@@ -86,7 +86,7 @@ transform:translateY(-8px) scale(1.18);
 box-shadow:0 12px 30px rgba(34,211,238,.5);
 }
 
-/* ==== PRODUCT HOVER EFFECT ==== */
+/* ==== ลูกเล่นรายกานสินค้า ==== */
 .product-card{
 transition:all .35s cubic-bezier(.4,0,.2,1);
 cursor:pointer;
@@ -114,6 +114,62 @@ transition:transform .3s ease, color .3s ease;
 color:#22d3ee;
 transform:translateX(6px);
 }
+
+/* ==== แสดงลิขสิทธิ์ ==== */
+.footer-bar{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+padding:12px 16px;
+background:rgba(15,23,42,.75);
+backdrop-filter:blur(10px);
+border-top:1px solid rgba(255,255,255,.1);
+text-align:center;
+font-size:13px;
+color:#94a3b8;
+z-index:998;
+transition:all .3s ease;
+}
+
+.mode-light .footer-bar{
+background:rgba(248,250,252,.9);
+color:#475569;
+border-top:1px solid rgba(0,0,0,.1);
+}
+
+.footer-bar span{
+color:#808080;
+font-weight:500;
+}
+
+.footer-bar:hover{
+color:#e5faff;
+}
+
+/* ==== CSS พลุ ==== */
+.spark {
+  position: fixed;
+  width: 10px;               /* ==== พลุขนาด ==== */
+  height: 14px;              /* ==== พลุขนาด ==== */
+  background: #e274fd;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: spark 600ms ease-out forwards;
+  box-shadow: 0 0 20px rgb(253, 236, 139);
+}
+
+@keyframes spark {
+  0% {
+    transform: translate(0,0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(0);
+    opacity: 0;
+  }
+}
+
 
 </style>
 </head>
@@ -147,7 +203,9 @@ transform:translateX(6px);
 </section>
 
 <section id="page-list" class="page page-hidden p-6">
-<h2 class="text-2xl font-bold mb-6">สินค้าทั้งหมด</h2>
+<h2 class="text-2xl font-bold mb-6">
+  สินค้าทั้งหมด (<span id="productCount">0</span> รายการ)
+</h2>
 <div id="productMain" class="grid md:grid-cols-4 gap-6"></div>
 </section>
 
@@ -175,11 +233,64 @@ transform:translateX(6px);
 
 <script>
 const products=[
-{name:"VOL.1",price:"150",image:"https://picsum.photos/500/300?1"},
-{name:"VOL.2",price:"180",image:"https://picsum.photos/500/300?2"},
-{name:"PACK",price:"250",image:"https://picsum.photos/500/300?3"},
-{name:"FX",price:"120",image:"https://picsum.photos/500/300?4"},
-{name:"CLUB",price:"300",image:"https://picsum.photos/500/300?5"}
+/* ==== แสดงลิ้งรายกานสินค้า ==== */
+{
+  name:"test1",
+  price:"150",
+  image:"https://picsum.photos/500/300?1",
+  link:"https://example.com/product/test1"
+},
+{
+  name:"test2",
+  price:"150",
+  image:"https://picsum.photos/500/300?2",
+  link:"https://example.com/product/test1"
+},
+{
+  name:"test3",
+  price:"150",
+  image:"https://picsum.photos/500/300?3",
+  link:"https://example.com/product/test1"
+},
+{
+  name:"test4",
+  price:"150",
+  image:"https://picsum.photos/500/300?4",
+  link:"https://example.com/product/test1"
+},
+{
+  name:"test5",
+  price:"150",
+  image:"https://picsum.photos/500/300?5",
+  link:"https://example.com/product/test1"
+},
+{
+  name:"test6",
+  price:"150",
+  image:"https://picsum.photos/500/300?6",
+  link:"https://example.com/product/test1"
+},
+{
+  name:"test7",
+  price:"150",
+  image:"https://picsum.photos/500/300?7",
+  link:"https://example.com/product/test1"
+},
+{
+  name:"test8",
+  price:"150",
+  image:"https://picsum.photos/500/300?8",
+  link:"https://example.com/product/test1"
+},
+{
+  name:"test9",
+  price:"150",
+  image:"https://picsum.photos/500/300?9",
+  link:"https://example.com/product/test1"
+},
+
+
+
 ];
 
 const body=document.body;
@@ -210,23 +321,53 @@ moveLine(document.getElementById("nav-"+p));
 function render(){
 productHome.innerHTML="";
 productMain.innerHTML="";
-products.forEach(p=>{
-const card=`
-<div class="glass rounded-2xl overflow-hidden product-card">
-  <img src="${p.image}" class="h-48 w-full object-cover">
-  <div class="p-4">
-    <h4 class="font-bold">${p.name}</h4>
-    <p class="product-price text-cyan-400">${p.price} บาท</p>
-  </div>
-</div>`;
-productHome.innerHTML+=card;
-productMain.innerHTML+=card;
-});
+  products.forEach(p=>{
+    const card=`
+    <a href="${p.link}" target="_blank" class="glass rounded-2xl overflow-hidden product-card block">
+      <img src="${p.image}" class="h-48 w-full object-cover">
+      <div class="p-4">
+        <h4 class="font-bold">${p.name}</h4>
+        <p class="product-price text-cyan-400">${p.price} บาท</p>
+      </div>
+    </a>
+    `;
+    productHome.innerHTML+=card;
+    productMain.innerHTML+=card;
+  });
 }
 
 render();
 moveLine(document.getElementById("nav-home"));
+document.getElementById("productCount").innerText = products.length;
+
+/* ==== CSS พลุ ==== */
+document.addEventListener("click", (e) => {
+  const x = e.clientX;
+  const y = e.clientY;
+
+  for (let i = 0; i < 30; i++) {
+    const spark = document.createElement("div");
+    spark.className = "spark";
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = Math.random() * 160 + 40;
+
+    spark.style.left = x + "px";
+    spark.style.top = y + "px";
+    spark.style.setProperty("--x", Math.cos(angle) * distance + "px");
+    spark.style.setProperty("--y", Math.sin(angle) * distance + "px");
+
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), 700);
+  }
+});
+
+
 </script>
 
+<footer class="footer-bar">
+© 2026 <span>RAPEEPHAT REMIX</span> — All Rights Reserved.
+
+</footer>
 </body>
 </html>
