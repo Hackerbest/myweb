@@ -19,33 +19,29 @@ body{font-family:'Kanit',sans-serif}
 .nav-wrap{
 position:relative;
 display:flex;
-background:rgba(0,0,0,.25);
-padding:6px;
-border-radius:999px;
+gap:4px;
+padding:6px 10px 14px;
 }
 
 .nav-btn{
-padding:8px 26px;
-border-radius:999px;
+padding:8px 22px;
 font-weight:500;
 font-size:14px;
 color:#94a3b8;
 position:relative;
-z-index:2;
 transition:color .3s ease;
 }
 
 .nav-btn:hover{color:#e5faff}
 
-.nav-indicator{
+.nav-underline{
 position:absolute;
-top:6px;
 bottom:6px;
+height:3px;
 width:0;
-border-radius:999px;
 background:#22d3ee;
+border-radius:999px;
 transition:all .45s cubic-bezier(.4,0,.2,1);
-z-index:1;
 }
 
 .page{
@@ -58,6 +54,39 @@ pointer-events:none;
 position:absolute;
 width:100%;
 }
+/*ไอคอนโซเชียล */
+.social-center{
+position:fixed;
+left:50%;
+bottom:26px;
+transform:translateX(-50%);
+display:flex;
+gap:16px;
+z-index:999;
+}
+
+.social-center a{
+width:52px;
+height:52px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+background:rgba(255,255,255,.08);
+color:#94a3b8;
+font-size:20px;
+transition:all .35s cubic-bezier(.4,0,.2,1);
+backdrop-filter:blur(8px);
+}
+
+.social-center a:hover{
+color:#22d3ee;
+background:rgba(34,211,238,.15);
+transform:translateY(-8px) scale(1.18);
+box-shadow:0 12px 30px rgba(34,211,238,.5);
+}
+
+
 </style>
 </head>
 
@@ -68,10 +97,13 @@ width:100%;
 <i class="fas fa-compact-disc fa-spin mr-2"></i>RAPEEPHAT REMIX
 </h1>
 
-<div class="hidden sm:flex nav-wrap" id="navWrap">
-<div class="nav-indicator" id="navIndicator"></div>
+<div class="hidden sm:block relative">
+<div class="nav-wrap" id="navWrap">
 <button onclick="showPage('home')" id="nav-home" class="nav-btn">หน้าหลัก</button>
 <button onclick="showPage('list')" id="nav-list" class="nav-btn">รายการ</button>
+<button onclick="showPage('contact')" id="nav-contact" class="nav-btn">ติดต่อ</button>
+</div>
+<div class="nav-underline" id="navLine"></div>
 </div>
 
 <button onclick="toggleMode()" class="w-10 h-10 glass rounded-full flex items-center justify-center">
@@ -81,16 +113,34 @@ width:100%;
 
 <div class="container mx-auto relative">
 
-<section id="page-home" class="page p-6 space-y-8">
-<h2 class="text-2xl font-bold text-cyan-400">สินค้าใหม่ล่าสุด</h2>
+<section id="page-home" class="page p-6">
+<h2 class="text-2xl font-bold text-cyan-400 mb-6">สินค้าใหม่ล่าสุด</h2>
 <div id="productHome" class="grid md:grid-cols-3 gap-6"></div>
 </section>
 
 <section id="page-list" class="page page-hidden p-6">
-<h3 class="text-2xl font-bold mb-4">
-สินค้าทั้งหมด (<span>5</span>)
-</h3>
+<h2 class="text-2xl font-bold mb-6">สินค้าทั้งหมด</h2>
 <div id="productMain" class="grid md:grid-cols-4 gap-6"></div>
+</section>
+
+<section id="page-contact" class="page page-hidden p-6">
+<h2 class="text-2xl font-bold mb-4">ติดต่อ</h2>
+<p class="text-slate-400">LINE : @rapeephat<br>Facebook : RAPEEPHAT REMIX</p>
+
+<div class="social-center">
+<a href="https://facebook.com/yourpage" target="_blank" title="Facebook">
+<i class="fab fa-facebook-f"></i>
+</a>
+
+<a href="https://www.tiktok.com/@yourid" target="_blank" title="TikTok">
+<i class="fab fa-tiktok"></i>
+</a>
+
+<a href="https://youtube.com/@yourchannel" target="_blank" title="YouTube">
+<i class="fab fa-youtube"></i>
+</a>
+</div>
+
 </section>
 
 </div>
@@ -101,35 +151,32 @@ const products=[
 {name:"VOL.2",price:"180",image:"https://picsum.photos/500/300?2"},
 {name:"PACK",price:"250",image:"https://picsum.photos/500/300?3"},
 {name:"FX",price:"120",image:"https://picsum.photos/500/300?4"},
-{name:"CLUB ",price:"300",image:"https://picsum.photos/500/300?5"}
+{name:"CLUB",price:"300",image:"https://picsum.photos/500/300?5"}
 ];
 
 const body=document.body;
 const icon=document.getElementById("modeIcon");
-const indicator=document.getElementById("navIndicator");
+const navLine=document.getElementById("navLine");
 
 function toggleMode(){
 const dark=body.classList.contains("mode-dark");
 body.classList.toggle("mode-dark",!dark);
 body.classList.toggle("mode-light",dark);
 icon.className=dark?"fas fa-sun":"fas fa-moon";
-localStorage.theme=dark?"light":"dark";
 }
 
-function moveIndicator(btn){
+function moveLine(btn){
 const r=btn.getBoundingClientRect();
-const p=btn.parentElement.getBoundingClientRect();
-indicator.style.width=r.width+"px";
-indicator.style.left=(r.left-p.left)+"px";
+const p=document.getElementById("navWrap").getBoundingClientRect();
+navLine.style.width=r.width+"px";
+navLine.style.left=(r.left-p.left)+"px";
 }
 
 function showPage(p){
-["home","list"].forEach(x=>{
+["home","list","contact"].forEach(x=>{
 document.getElementById("page-"+x).classList.toggle("page-hidden",x!==p);
 });
-
-const btn=document.getElementById("nav-"+p);
-moveIndicator(btn);
+moveLine(document.getElementById("nav-"+p));
 }
 
 function render(){
@@ -140,8 +187,8 @@ const card=`
 <div class="glass rounded-2xl overflow-hidden">
 <img src="${p.image}" class="h-48 w-full object-cover">
 <div class="p-4">
-<h4 class="font-bold text-lg">${p.name}</h4>
-<p class="text-cyan-400 font-semibold mt-1">${p.price} บาท</p>
+<h4 class="font-bold">${p.name}</h4>
+<p class="text-cyan-400">${p.price} บาท</p>
 </div>
 </div>`;
 productHome.innerHTML+=card;
@@ -150,7 +197,7 @@ productMain.innerHTML+=card;
 }
 
 render();
-moveIndicator(document.getElementById("nav-home"));
+moveLine(document.getElementById("nav-home"));
 </script>
 
 </body>
