@@ -46,7 +46,7 @@ body{font-family:'Kanit',sans-serif}
     </div>
 
     <div class="flex-1">
-      <h2 class="text-3xl font-bold mb-2">บ่กล้าบอกครู</h2>
+      <h2 class="text-3xl font-bold mb-2">HZ01 เพลงเต้นแอโลบิค ไทยลูกทุ่งปนสากล 23เพลง2คูลดาวน์ เดินเบส [178]</h2>
       <p class="text-xs text-slate-400 mb-4">2026</p>
 
       <div id="waveform" class="bg-black/30 rounded-xl p-2 mb-2"></div>
@@ -61,7 +61,7 @@ body{font-family:'Kanit',sans-serif}
 
 <!-- BOTTOM BAR -->
 <div class="fixed bottom-0 w-full glass p-4 flex justify-between items-center">
-  <div class="w-1/3 truncate font-bold">บ่กล้าบอกครู</div>
+  <div class="w-1/3 truncate font-bold">HZ01 เพลงเต้นแอโลบิค ไทยลูกทุ่งปนสากล 23เพลง2คูลดาวน์ เดินเบส [178]</div>
 
   <button id="playBtn" class="bg-white text-black w-14 h-14 rounded-full flex items-center justify-center">
     <i id="playIcon" class="fas fa-play ml-1"></i>
@@ -89,9 +89,8 @@ const ws = WaveSurfer.create({
   normalize: true
 })
 
-ws.load(
-  "https://raw.githubusercontent.com/Hackerbest/myweb/main/%E0%B8%9A%E0%B9%88%E0%B8%81%E0%B8%A5%E0%B9%89%E0%B8%B2%E0%B8%9A%E0%B8%AD%E0%B8%81%E0%B8%84%E0%B8%A3%E0%B8%B9.mp3"
-)
+ws.load("https://raw.githubusercontent.com/Hackerbest/myweb/main/HZ01.mp3")
+
 
 /* ===== Controls ===== */
 playBtn.onclick = () => ws.playPause()
