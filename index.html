@@ -16,6 +16,8 @@ body{font-family:'Kanit',sans-serif}
 .glass{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
 .mode-light .glass{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.1)}
 
+
+/* ==== กล่องแท็บ ==== */
 .nav-wrap{
 position:relative;
 display:flex;
@@ -23,7 +25,7 @@ gap:4px;
 padding:6px 10px 14px;
 }
 
-.nav-btn{
+.nav-btn{ /* ==== สีตัวอักษรแท็บ ==== */
 padding:8px 22px;
 font-weight:500;
 font-size:14px;
@@ -43,7 +45,7 @@ background:#22d3ee;
 border-radius:999px;
 transition:all .45s cubic-bezier(.4,0,.2,1);
 }
-
+/* ====  ==== */
 .page{
 transition:opacity .45s ease, transform .45s ease;
 }
@@ -239,34 +241,34 @@ color:#e5faff;
 const products=[
 /* ==== แสดงลิ้งรายกานสินค้า ==== */
 {
-  name:"BPM 170 (ยังไม่สมบูรณ์)",
+  name:"BPM 160 (ยังไม่สมบูรณ์)",
   price:"300 - 450",
   image:"https://picsum.photos/500/300?1",
-  link:"https://example.com/product/test1"
+  link:"list160.html"
 },
 {
-  name:"BPM 178 (ทำแล้ว 10%)",
+  name:"BPM 170 (ทำแล้ว 10%)",
   price:"300 - 450",
   image:"https://picsum.photos/500/300?2",
-  link: "list1.html"
+  link: "list170.html"
+},
+{
+  name:"BPM 178 (ยังไม่สมบูรณ์)",
+  price:"300 - 450",
+  image:"https://picsum.photos/500/300?3",
+  link:"list178"
 },
 {
   name:"BPM 180 (ยังไม่สมบูรณ์)",
   price:"300 - 450",
-  image:"https://picsum.photos/500/300?3",
-  link:"https://example.com/product/test3"
+  image:"https://picsum.photos/500/300?4",
+  link:"list180"
 },
 {
   name:"BPM 190 (ยังไม่สมบูรณ์)",
   price:"300 - 450",
-  image:"https://picsum.photos/500/300?4",
-  link:"https://example.com/product/test3"
-},
-{
-  name:"BPM 195 (ยังไม่สมบูรณ์)",
-  price:"300 - 450",
   image:"https://picsum.photos/500/300?5",
-  link:"https://example.com/product/test4"
+  link:"list190"
 },
 ];
 
@@ -343,8 +345,8 @@ document.addEventListener("click", (e) => {
 </script>
 
 <footer class="footer-bar">
-© 2026 <span>RAPEEPHAT REMIX</span> — All Rights Reserved.
-
+© 2026 RAPEEPHAT REMIX<span></span> — All Rights Reserved.
 </footer>
+
 </body>
 </html>
