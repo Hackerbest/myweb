@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAPEEPHAT SHOP</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+  background:#020617;
+  font-family:'Kanit',sans-serif;
+  color:#e5e7eb;
+  scroll-behavior:smooth;
+}
+.glass{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+}
+
+
+/* ==== กล่องแท็บ ==== */
+
+.nav-wrap{
+  position:relative;
+  display:flex;
+  gap:4px;
+  padding:6px 10px 14px;
+}
+
+.nav-btn{
+  padding:8px 22px;
+  font-size:14px;
+  font-weight:500;
+  color:#94a3b8;   /* สีเดียวกับ SHOP */
+  transition:color .3s ease;
+}
+
+.nav-btn:hover{
+  color:#e5faff;   /* hover แบบ SHOP */
+}
+
+.nav-btn.active{
+  color:#22d3ee;   /* active สีเดียว */
+  text-shadow:none; /* ❌ เอา glow ออก */
+}
+
+.nav-underline{
+  position:absolute;
+  bottom:6px;
+  height:3px;
+  width:0;
+  background:#22d3ee;   /* ✅ สีเดียวกับ SHOP */
+  border-radius:999px;
+  box-shadow:none;      /* ❌ ไม่มี glow */
+  transition:all .45s cubic-bezier(.4,0,.2,1);
+}
+
+
+/* ===== TRACK ===== */
+.track{
+  background:#020617;
+  border:1px solid #1e293b;
+  transition:.25s;
+}
+.track:hover{
+  transform:translateY(-6px);
+  box-shadow:0 20px 40px rgba(34,211,238,.25);
+}
+.track.active{
+  border-color:#22d3ee;
+  box-shadow:0 0 0 1px #22d3ee55,0 0 25px #22d3ee33;
+}
+.play{
+  width:38px;height:38px;
+  border:1px solid #334155;
+}
+
+/* ===== FOOTER ===== */
+.footer-bar{
+  position:fixed;
+  bottom:0;left:0;
+  width:100%;
+  padding:12px;
+  background:rgba(15,23,42,.75);
+  backdrop-filter:blur(10px);
+  border-top:1px solid rgba(255,255,255,.1);
+  text-align:center;
+  font-size:13px;
+  color:#94a3b8;
+}
+section{scroll-margin-top:110px}
+
+/* ===== DARK / LIGHT MODE ===== */
+.mode-dark{
+  background:#020617;
+  color:#e5e7eb;
+}
+
+.mode-light{
+  background:#f8fafc;
+  color:#0f172a;
+}
+
+.mode-light .glass{
+  background:rgba(255,255,255,.85);
+  border:1px solid rgba(0,0,0,.1);
+}
+
+.mode-light .track{
+  background:#ffffff;
+  border-color:#e2e8f0;
+}
+
+.mode-light .footer-bar{
+  background:rgba(248,250,252,.9);
+  color:#475569;
+  border-top:1px solid rgba(0,0,0,.1);
+}
+
+/* ==== CSS พลุ ==== */
+.spark {
+  position: fixed;
+  width: 18px;               /* ==== พลุขนาด ==== */
+  height: 14px;              /* ==== พลุขนาด ==== */
+  background: #e274fd;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: spark 600ms ease-out forwards;
+  box-shadow: 0 0 20px rgb(253, 236, 139);
+}
+
+@keyframes spark {
+  0% {
+    transform: translate(0,0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(0);
+    opacity: 0;
+  }
+}
+</style>
+</head>
+
+<body class="pb-32">
+
+<!-- HEADER -->
+<header class="p-4 glass sticky top-0 z-50 flex justify-between items-center px-6">
+<h1 class="text-cyan-400 text-xl font-bold flex items-center">
+<i class="fas fa-compact-disc fa-spin mr-2"></i>RAPEEPHAT REMIX
+</h1>
+
+    <div class="nav-wrap absolute left-1/2 -translate-x-1/2 text-sm">
+      <a href="index.html" class="nav-btn active">หน้าแรก</a>
+      <a href="#home" class="nav-btn">รายการ</a>
+      <a href="#contact" class="nav-btn">ติดต่อ</a>
+      <span class="nav-underline" id="navLine"></span>
+    </div>
+<div class="nav-underline" id="navLine"></div>
+</div>
+
+<button onclick="toggleMode()" class="w-10 h-10 glass rounded-full flex items-center justify-center">
+<i id="modeIcon" class="fas fa-moon"></i>
+</button>
+</header>
+
+<!-- HOME -->
+<section id="home" class="pt-28 p-6 max-w-3xl mx-auto">
+  <div class="rounded-3xl p-6 border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-transparent">
+    <h2 class="text-3xl font-extrabold text-cyan-400">🎧 RAPEEPHAT REMIX</h2>
+    <p class="mt-2 text-slate-300 text-sm">
+      ตัวอย่างรายการ เพลง แอโรบิค ความเร็ว BPM 190
+    </p>
+  </div>
+</section>
+
+<!-- LIST -->
+<section id="list" class="p-6 max-w-3xl mx-auto space-y-4">
+  <h2 class="text-lg font-bold text-cyan-400">
+    รายการเพลงทั้งหมด (<span id="songCount"></span>)
+  </h2>
+  <div id="songList"></div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="p-6 max-w-3xl mx-auto">
+  <h2 class="text-xl font-bold text-cyan-400 mb-2">รายละเอียด</h2>
+  <p class="text-slate-300 text-sm">
+    1 . รายการแต่ละ เพลงเป็นตัวอย่างของชุดเพลงนั้นๆ ว่ามีเพลงอะไรบ้าง เพลงคูลดาวน์จะมีให้ทั้งหมดทุกชุด สามารถแจ้งได้ว่าต้องการเปลี่ยนเพลงคูลดาวน์ เป็นเพลงไหนได้
+    <br>
+    2 . ถ้าต้องการชุดนี้แต่ขอความไวช้าลง หรือ เร็วกว่านี้ สามารถทำได้ โดยทำการแคปหน้าจอ แล้วไปแจ่้งรายละเอียดเติ่มได้ทุกช่องทาง
+    <br>
+    3 . ชื้อชุดแบบสำเร็จ ไม่สามารถแก้ไข (ย้ำว่าไม่สามารถแก้ไขได้ จะแก้ไขได้แค่เพลงคูลดาวน์)
+    <br>
+    4 . รับทำแอโลบิคใหม่ทั้งหมด ราคาขึ้นอยู่กับความยากของแต่ละเพลง เริ่มต้นอยุ่ที่ 300+ขึ้นไป ไม่เดินเบสเพลง ส่วน ราคาเดินเบสเพลงอยู่ที่ 350+ ถ้าเป็นเพลงสากลเก่า ราคา 400 (ต้องแบบไหนแจ้งรายละเอียดให้ทราบ จะได้ไม่มีปปัญหามาตามภายหลัง)
+    <br>
+    5 . รับแก้ไขเพลง ไม่ว่าจะแก้ไขความเร็วเพลง หรือตัดต่อเพลง ราคารับแก้อยู่ที่ 100 ต่อ1ชุด (ผลงานของคนอื่น)
+    <br>
+    6 . รับทำเพลงแข่งไม่ว่าจะระดับประเทศ หรือ ระดับจังหวัด และ ตำบล
+    <br>
+    7 . ประสบการณ์การทำเพลงมากกว่า 7 ปี ผลงานมากมายทั้วทุกภาค ไม่ว่าจะเพลงแข่ง ระดับประเทศ หรือ ระดับจังหวัด และตำบล ผลงานเอกลักษณ์ของตัวเอง ไม่มีนำของคนอื่นมาขายต่อ เสียงชัดเจน (ถ้าเสียงไม่ชัดเจน = ของคนอื่นขายต่อมาแล้วตัดต่อจนเสียงไม่ชัด แบบนี้ให้ รับประกันเลยวว่าไม่ใช่ของผลงานของ RAPEEPHAT REMIX)
+    <br>
+    8 . สอบถามเพิ่มเติมรายละเอียดส่วนไหนไม่เข้าใจได้เลยครับ
+  </p>
+</section>
+
+<script>
+const songs=[
+{title:"HZ01 แอโรบิค ไทยลูกทุ่ง",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HZ01.mp3"},
+{title:"HZ02 แอโรบิค สามซ่า",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HZ02.mp3"},
+{title:"HZ03 แอโรบิค สามซ่า",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HZ03.mp3"}
+];
+
+
+const list=document.getElementById("songList");
+document.getElementById("songCount").innerText=songs.length;
+
+let players=[];
+let autoNext = false;
+
+list.innerHTML=songs.map((s,i)=>`
+<div class="track rounded-2xl p-4 space-y-3 mb-4" id="card-${i}">
+  <div class="flex items-center gap-3">
+    <button id="btn-${i}" class="play rounded-full flex items-center justify-center">
+      <i class="fas fa-play"></i>
+    </button>
+    <div class="flex-1">
+      <div class="font-semibold">${s.title}</div>
+      <div class="text-xs text-slate-400">
+        <span id="t-${i}">0:00</span> / <span id="d-${i}">0:00</span>
+      </div>
+    </div>
+  </div>
+  <div id="wave-${i}" class="h-[70px] rounded-xl bg-black/40"></div>
+</div>
+`).join("");
+
+songs.forEach((s,i)=>{
+const ws=WaveSurfer.create({
+  container:"#wave-"+i,
+  height:70,
+  barWidth:2,
+  waveColor:"#334155",
+  progressColor:"#22d3ee",
+  cursorColor:"#22d3ee"
+});
+
+ws.load(s.url);
+players.push(ws);
+
+ws.on("ready",()=>setDur(i,ws.getDuration()));
+ws.on("audioprocess",()=>setTime(i,ws.getCurrentTime()));
+
+
+  ws.on("play",()=>{
+    if(!autoNext) stopAll(i);
+    autoNext=false;
+    setActive(i,true);
+  });
+
+  ws.on("pause",()=>setActive(i,false));
+
+  ws.on("finish",()=>{
+    if(players[i+1]){
+      autoNext=true;
+      players[i+1].play();
+    }
+  });
+
+  document.getElementById("btn-"+i).onclick=()=>{
+    autoNext=false;
+    ws.playPause();
+  };
+});
+
+function stopAll(x){players.forEach((p,i)=>i!==x&&p.pause())}
+function setActive(i,on){
+  document.getElementById("card-"+i).classList.toggle("active",on);
+  document.getElementById("btn-"+i).innerHTML=
+    on?'<i class="fas fa-pause"></i>':'<i class="fas fa-play"></i>';
+}
+function fmt(s){return Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0")}
+function setDur(i,v){document.getElementById("d-"+i).innerText=fmt(v)}
+function setTime(i,v){document.getElementById("t-"+i).innerText=fmt(v)}
+
+/* ===== NAV EFFECT ===== */
+const navBtns=document.querySelectorAll(".nav-btn");
+const navLine=document.getElementById("navLine");
+const sections=[...document.querySelectorAll("section")];
+
+function moveLine(el){
+navLine.style.width=el.offsetWidth+"px";
+navLine.style.left=el.offsetLeft+"px";
+}
+window.onload=()=>moveLine(document.querySelector(".nav-btn.active"));
+
+navBtns.forEach(b=>b.onclick=()=>{
+navBtns.forEach(x=>x.classList.remove("active"));
+b.classList.add("active");
+moveLine(b);
+});
+
+window.addEventListener("scroll",()=>{
+let cur="home";
+sections.forEach(s=>{
+if(scrollY>=s.offsetTop-140)cur=s.id;
+});
+navBtns.forEach(b=>{
+b.classList.toggle("active",b.getAttribute("href")==="#"+cur);
+if(b.classList.contains("active"))moveLine(b);
+});
+});
+
+/* ===== DARK / LIGHT TOGGLE ===== */
+const body = document.body;
+const icon = document.getElementById("modeIcon");
+
+function toggleMode(){
+  const dark = body.classList.contains("mode-dark");
+
+  body.classList.toggle("mode-dark", !dark);
+  body.classList.toggle("mode-light", dark);
+
+  icon.className = dark ? "fas fa-sun" : "fas fa-moon";
+}
+/* ==== CSS พลุ ==== */
+document.addEventListener("click", (e) => {
+  const x = e.clientX;
+  const y = e.clientY;
+
+  for (let i = 0; i < 30; i++) {
+    const spark = document.createElement("div");
+    spark.className = "spark";
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = Math.random() * 160 + 40;
+
+    spark.style.left = x + "px";
+    spark.style.top = y + "px";
+    spark.style.setProperty("--x", Math.cos(angle) * distance + "px");
+    spark.style.setProperty("--y", Math.sin(angle) * distance + "px");
+
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), 700);
+  }
+});
+
+</script>
+<footer class="footer-bar">
+© 2026 RAPEEPHAT REMIX<span></span> — All Rights Reserved.
+</footer>
+</body>
+</html>
