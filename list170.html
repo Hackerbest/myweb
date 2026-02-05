@@ -176,6 +176,8 @@ color:#e5faff;
     opacity: 0;
   }
 }
+
+
 </style>
 </head>
 
@@ -243,9 +245,9 @@ color:#e5faff;
 
 <script>
 const songs=[
-{title:"HZV1700103302 แอโรบิค ไทยลูกทุ่ง",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HZV1700103302.mp3"},
-{title:"HZ1700202202 แอโรบิค สามซ่า",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HZ1700202202.mp3"},
-{title:"HZ1700302501 แอโรบิค สามซ่า",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HZ1700302501.mp3"}
+{title:"HTV1700103302 แอโรบิค ไทยลูกทุ่ง",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HTV1700103302.mp3",price:300},
+{title:"HTV1700202202 แอโรบิค สามซ่า",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HTV1700202202.mp3",price:300},
+{title:"HTV1700302501 แอโรบิค สามซ่า",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HTV1700302501.mp3",price:300}
 ];
 
 
@@ -262,9 +264,14 @@ list.innerHTML=songs.map((s,i)=>`
       <i class="fas fa-play"></i>
     </button>
     <div class="flex-1">
-      <div class="font-semibold">${s.title}</div>
-      <div class="text-xs text-slate-400">
-        <span id="t-${i}">0:00</span> / <span id="d-${i}">0:00</span>
+<div class="font-semibold">${s.title}</div>
+
+<div class="text-red-400 font-bold text-sm">
+  ราคา ${s.price} บาท
+</div>
+
+<div class="text-xs text-slate-400">
+  <span id="t-${i}">0:00</span> / <span id="d-${i}">0:00</span>
       </div>
     </div>
   </div>
