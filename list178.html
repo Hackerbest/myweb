@@ -245,9 +245,9 @@ color:#e5faff;
 
 <script>
 const songs=[
-{title:"HZ01 แอโรบิค ไทยลูกทุ่ง",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HZ01.mp3"},
-{title:"HZ02 แอโรบิค สามซ่า",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HZ02.mp3"},
-{title:"HZ03 แอโรบิค สามซ่า",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HZ03.mp3"}
+{title:"HTV1780102202 แอโรบิค ไทยลูกทุ่ง",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HTV1780102202.mp3",price:300},
+{title:"HTV1780202202 แอโรบิค สามซ่า",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HTV1780202202.mp3",price:300},
+{title:"HZ03 แอโรบิค สามซ่า",url:"https://raw.githubusercontent.com/Hackerbest/myweb/main/HZ03.mp3",price:300}
 ];
 
 
@@ -264,9 +264,14 @@ list.innerHTML=songs.map((s,i)=>`
       <i class="fas fa-play"></i>
     </button>
     <div class="flex-1">
-      <div class="font-semibold">${s.title}</div>
-      <div class="text-xs text-slate-400">
-        <span id="t-${i}">0:00</span> / <span id="d-${i}">0:00</span>
+<div class="font-semibold">${s.title}</div>
+
+<div class="text-red-400 font-bold text-sm">
+  ราคา ${s.price} บาท
+</div>
+
+<div class="text-xs text-slate-400">
+  <span id="t-${i}">0:00</span> / <span id="d-${i}">0:00</span>
       </div>
     </div>
   </div>
